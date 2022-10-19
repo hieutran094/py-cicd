@@ -1,0 +1,32 @@
+name: Release
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2
+
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+
+      - name: Setup pyinstaller
+        run: pip install pyinstaller
+
+      - name: Build
+        run: pyinstaller --onefile index.py
+
+      - name: See dir
+        run: dir dist
+
+      - name: Upload Build file to slack
+        uses: adrey/slack-file-upload-action@master
+        with:
+          initial_comment: New Release build file
+          token: ${{ secrets.SLACK_TOKEN }}
+          path: dist/index.exe
+          channel: github
